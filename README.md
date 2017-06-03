@@ -1,4 +1,4 @@
-# ardyno
+# dynamixel_teensy
 
 Teensy 3.x library for dynamixel servos
 
