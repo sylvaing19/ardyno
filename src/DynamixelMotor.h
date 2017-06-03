@@ -6,11 +6,17 @@
 #ifndef DYNAMIXEL_MOTOR_H
 #define DYNAMIXEL_MOTOR_H
 
+#if defined(ARDUINO) && ARDUINO >= 100
+	#include "Arduino.h"
+#else
+	#include "WProgram.h"
+#endif
+
 #include "DynamixelInterface.h"
 
 class DynamixelDevice
 {
-	public:
+public:
 	
 	DynamixelDevice(DynamixelInterface &aInterface, DynamixelID aId);
 	
@@ -25,8 +31,6 @@ class DynamixelDevice
 	{
 		return mID;
 	}
-
-	DynamixelStatus changeId(uint8_t id);
 	
 	uint8_t statusReturnLevel();
 	void statusReturnLevel(uint8_t aSRL);
@@ -70,18 +74,20 @@ class DynamixelDevice
 		return mStatus=mInterface.reset(mID, mStatusReturnLevel);
 	}
 	
-	private:
+private:
 	
 	DynamixelInterface &mInterface;
-	DynamixelID mID;
 	uint8_t mStatusReturnLevel;
 	DynamixelStatus mStatus;
+
+protected:
+	DynamixelID mID;
 };
 
 
 class DynamixelMotor:public DynamixelDevice
 {
-	public:
+public:
 	
 	DynamixelMotor(DynamixelInterface &aInterface, DynamixelID aId);
 	
@@ -89,12 +95,18 @@ class DynamixelMotor:public DynamixelDevice
 	void jointMode(uint16_t aCWLimit=0, uint16_t aCCWLimit=0x3FF);
 	
 	void enableTorque(bool aTorque=true);
-	void speed(int16_t aSpeed);
-	void goalPosition(uint16_t aPosition);
+	DynamixelStatus alarmShutdown(uint8_t aMode = 0x04);
+	DynamixelStatus speed(uint16_t aSpeed);
+	DynamixelStatus torqueLimit(uint16_t aTorque);
+	DynamixelStatus goalPosition(uint16_t aPosition);
+	DynamixelStatus goalPositionDegree(uint16_t posDeg);
+
+	void setId(uint8_t newId);
 	
 	void led(uint8_t aState);
 
 	uint16_t currentPosition();
+	uint16_t currentPositionDegree();
 };
 
 #endif

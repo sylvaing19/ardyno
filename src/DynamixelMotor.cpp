@@ -8,15 +8,6 @@ DynamixelDevice::DynamixelDevice(DynamixelInterface &aInterface, DynamixelID aID
 		mStatusReturnLevel=0;
 }
 
-DynamixelStatus DynamixelDevice::changeId(uint8_t id)
-{
-	DynamixelStatus result;
-	result=write(DYN_ADDRESS_ID, id);
-	if(result==DYN_STATUS_OK)
-		mID=id;
-	return result;
-}
-
 uint8_t DynamixelDevice::statusReturnLevel()
 {
 	if(mStatusReturnLevel==255)
@@ -60,7 +51,7 @@ void DynamixelDevice::communicationSpeed(uint32_t aSpeed)
 
 DynamixelStatus DynamixelDevice::init()
 {
-	mStatusReturnLevel=2;
+	//mStatusReturnLevel=0;
 	DynamixelStatus status=ping();
 	if(status!=DYN_STATUS_OK)
 	{
@@ -97,16 +88,36 @@ void DynamixelMotor::enableTorque(bool aTorque)
 	write(DYN_ADDRESS_ENABLE_TORQUE, uint8_t(aTorque?1:0));
 }
 
-void DynamixelMotor::speed(int16_t aSpeed)
+DynamixelStatus DynamixelMotor::alarmShutdown(uint8_t aMode)
 {
-	if(aSpeed<0)
-		aSpeed=-aSpeed | 1024;
-	write(DYN_ADDRESS_GOAL_SPEED, aSpeed);
+	aMode &= B01111111;
+	return write(DYN_ADDRESS_ALARM_SHUTDOWN, aMode);
 }
 
-void DynamixelMotor::goalPosition(uint16_t aPosition)
+DynamixelStatus DynamixelMotor::speed(uint16_t aSpeed)
 {
-	write(DYN_ADDRESS_GOAL_POSITION, aPosition);
+	return write(DYN_ADDRESS_GOAL_SPEED, aSpeed);
+}
+
+DynamixelStatus DynamixelMotor::torqueLimit(uint16_t aTorque)
+{
+	return write(DYN_ADDRESS_TORQUE_LIMIT, aTorque);
+}
+
+DynamixelStatus DynamixelMotor::goalPosition(uint16_t aPosition)
+{
+	return write(DYN_ADDRESS_GOAL_POSITION, aPosition);
+}
+
+DynamixelStatus DynamixelMotor::goalPositionDegree(uint16_t posDeg)
+{
+	return goalPosition(posDeg * 3.41);
+}
+
+void DynamixelMotor::setId(uint8_t newId)
+{
+	write(DYN_ADDRESS_ID, newId);
+	mID = newId;
 }
 
 void DynamixelMotor::led(uint8_t aState)
@@ -117,7 +128,18 @@ void DynamixelMotor::led(uint8_t aState)
 uint16_t DynamixelMotor::currentPosition()
 {
 	uint16_t currentPosition;
-	read(DYN_ADDRESS_CURRENT_POSITION, currentPosition);
-	return currentPosition;
+	if (read(DYN_ADDRESS_CURRENT_POSITION, currentPosition) == 0)
+	{
+		return currentPosition;
+	}
+	else
+	{
+		return UINT16_MAX;
+	}
+}
+
+uint16_t DynamixelMotor::currentPositionDegree()
+{
+	return (uint16_t)((float)currentPosition() / 3.41);
 }
 
