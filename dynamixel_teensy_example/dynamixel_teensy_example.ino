@@ -1,0 +1,28 @@
+#include "Dynamixel.h"
+#include "DynamixelInterface.h"
+#include "DynamixelMotor.h"
+
+void setup()
+{
+	Serial.println("Mon chibre est tentaculaire");
+}
+
+void loop()
+{
+	DynamixelInterface dInterface(Serial1, 50);	// Stream , timeout
+	DynamixelMotor motor(dInterface, 0);	// Interface , ID
+
+	motor.init(); // This will get the returnStatusLevel of the servo
+	Serial.printf("Status return level = %u\n", motor.statusReturnLevel());
+	motor.jointMode(); // Set the angular limits of the servo. Set to [min, max] by default
+	motor.enableTorque();
+
+	while (true)
+	{
+		motor.goalPositionDegree(140);
+		delay(1000);
+		motor.goalPositionDegree(160);
+		delay(1000);
+	}
+
+}
