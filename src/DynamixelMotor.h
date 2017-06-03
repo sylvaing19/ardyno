@@ -6,18 +6,11 @@
 #ifndef DYNAMIXEL_MOTOR_H
 #define DYNAMIXEL_MOTOR_H
 
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
-#else
-	#include "WProgram.h"
-#endif
-
 #include "DynamixelInterface.h"
 
 class DynamixelDevice
 {
 public:
-	
 	DynamixelDevice(DynamixelInterface &aInterface, DynamixelID aId);
 	
 	DynamixelStatus init();
@@ -44,34 +37,34 @@ public:
 	template<class T>
 	inline DynamixelStatus read(uint8_t aAddress, T& aData)
 	{
-		return mStatus=mInterface.read<T>(mID, aAddress, aData, mStatusReturnLevel);
+		return mStatus = mInterface.read<T>(mID, aAddress, aData, mStatusReturnLevel);
 	}
 	
 	template<class T>
 	inline DynamixelStatus write(uint8_t aAddress, const T& aData)
 	{
-		return mStatus=mInterface.write<T>(mID, aAddress, aData, mStatusReturnLevel);
+		return mStatus = mInterface.write<T>(mID, aAddress, aData, mStatusReturnLevel);
 	}
 	
 	template<class T>
 	inline DynamixelStatus regWrite(uint8_t aAddress, const T& aData)
 	{
-		return mStatus=mInterface.regWrite<T>(mID, aAddress, aData, mStatusReturnLevel);
+		return mStatus = mInterface.regWrite<T>(mID, aAddress, aData, mStatusReturnLevel);
 	}
 	
 	DynamixelStatus ping()
 	{
-		return mStatus=mInterface.ping(mID);
+		return mStatus = mInterface.ping(mID);
 	}
 	
 	DynamixelStatus action()
 	{
-		return mStatus=mInterface.action(mID, mStatusReturnLevel);
+		return mStatus = mInterface.action(mID, mStatusReturnLevel);
 	}
 	
 	DynamixelStatus reset()
 	{
-		return mStatus=mInterface.reset(mID, mStatusReturnLevel);
+		return mStatus = mInterface.reset(mID, mStatusReturnLevel);
 	}
 	
 private:
@@ -92,9 +85,9 @@ public:
 	DynamixelMotor(DynamixelInterface &aInterface, DynamixelID aId);
 	
 	void wheelMode();
-	void jointMode(uint16_t aCWLimit=0, uint16_t aCCWLimit=0x3FF);
+	void jointMode(uint16_t aCWLimit = 0, uint16_t aCCWLimit = 0x3FF);
 	
-	void enableTorque(bool aTorque=true);
+	void enableTorque(bool aTorque = true);
 	DynamixelStatus alarmShutdown(uint8_t aMode = 0x04);
 	DynamixelStatus speed(uint16_t aSpeed);
 	DynamixelStatus torqueLimit(uint16_t aTorque);

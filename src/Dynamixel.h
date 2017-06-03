@@ -6,12 +6,6 @@
 #ifndef DYNAMIXEL_H
 #define DYNAMIXEL_H
 
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
-#else
-	#include "WProgram.h"
-#endif
-
 #include <stdint.h>
 #include <stdlib.h> 
 
@@ -87,7 +81,7 @@ struct DynamixelPacket
 	DynamixelPacket(uint8_t aID, uint8_t aInstruction, uint8_t aLength, const uint8_t *aData, uint8_t aAddress=255, uint8_t aDataLength=255, uint8_t aIDListSize=0, const uint8_t *aIDList=NULL):
 		mID(aID), mIDListSize(aIDListSize), mIDList(const_cast<uint8_t*>(aIDList)), mLength(aLength), mInstruction(aInstruction), mAddress(aAddress), mDataLength(aDataLength), mData(const_cast<uint8_t*>(aData))
 	{
-		mCheckSum=checkSum();
+		mCheckSum = checkSum();
 	}
 	
 	/** \brief Packet ID */
@@ -98,7 +92,8 @@ struct DynamixelPacket
 	/** \brief Packet length (full length)*/
 	uint8_t mLength;
 	/** \brief Packet instruction or status */
-	union{
+	union
+	{
 		DynamixelInstruction mInstruction;
 		DynamixelStatus mStatus;
 	};
@@ -150,24 +145,25 @@ enum DynCommonAddress
 */
 enum DynMotorAddress
 {
-	/** \brief Clockwise angle limit, uint16_t , writable */
+	/** \brief Clockwise angle limit, uint16_t , writable, EEPROM */
 	DYN_ADDRESS_CW_LIMIT = 0x06,
-	/** \brief Counnter clockwise angle limit, uint16_t , writable */
+	/** \brief Counnter clockwise angle limit, uint16_t , writable, EEPROM */
 	DYN_ADDRESS_CCW_LIMIT = 0x08,
-	/** \brief Maximum torque, uint16_t , writable */
+	/** \brief Default maximum torque, uint16_t , writable, EEPROM */
 	DYN_ADDRESS_MAX_TORQUE = 0x0E,
+	/** \brief Dynamic maximum torque, uint16_t , writable, RAM */
 	DYN_ADDRESS_TORQUE_LIMIT = 0x22,
-
+	/** \brief Define error cases leading to shutdown, uint8_t , writable, EEPROM */
 	DYN_ADDRESS_ALARM_SHUTDOWN = 0x12,
-	/** \brief Enable torque, uint8_t , writable */
+	/** \brief Enable torque, uint8_t , writable, RAM */
 	DYN_ADDRESS_ENABLE_TORQUE = 0x18,
-	/** \brief LED state, uint8_t , writable */
+	/** \brief LED state, uint8_t , writable, RAM */
 	DYN_ADDRESS_LED = 0x19,
-	/** \brief Goal position, uint16_t , writable */
+	/** \brief Goal position, uint16_t , writable, RAM */
 	DYN_ADDRESS_GOAL_POSITION = 0x1E,
-	/** \brief Goal speed, uint16_t , writable */
+	/** \brief Goal speed, uint16_t , writable, RAM */
 	DYN_ADDRESS_GOAL_SPEED = 0x20,
-	/** \brief Current position, uint16_t , readable */
+	/** \brief Current position, uint16_t , readable, RAM */
 	DYN_ADDRESS_CURRENT_POSITION = 0x24,
 };
 

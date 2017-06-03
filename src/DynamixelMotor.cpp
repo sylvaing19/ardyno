@@ -3,14 +3,16 @@
 DynamixelDevice::DynamixelDevice(DynamixelInterface &aInterface, DynamixelID aID):
 	mInterface(aInterface), mID(aID), mStatusReturnLevel(255)
 {
-	mStatus=DYN_STATUS_OK;
-	if(mID==BROADCAST_ID)
-		mStatusReturnLevel=0;
+	mStatus = DYN_STATUS_OK;
+	if (mID == BROADCAST_ID)
+	{
+		mStatusReturnLevel = 0;
+	}
 }
 
 uint8_t DynamixelDevice::statusReturnLevel()
 {
-	if(mStatusReturnLevel==255)
+	if (mStatusReturnLevel == 255)
 	{
 		init();
 	}
@@ -20,9 +22,9 @@ uint8_t DynamixelDevice::statusReturnLevel()
 void DynamixelDevice::statusReturnLevel(uint8_t aSRL)
 {
 	write(DYN_ADDRESS_SRL, aSRL);
-	if(status()==DYN_STATUS_OK)
+	if (status() == DYN_STATUS_OK)
 	{
-		mStatusReturnLevel=aSRL;
+		mStatusReturnLevel = aSRL;
 	}
 }
 
@@ -42,8 +44,8 @@ uint8_t DynamixelDevice::firmware()
 
 void DynamixelDevice::communicationSpeed(uint32_t aSpeed)
 {
-	uint8_t value=2000000/aSpeed-1;
-	if(value!=0) // forbid 2MBd rate, because it is out of spec, and can be difficult to undo
+	uint8_t value = 2000000 / aSpeed - 1;
+	if (value != 0) // forbid 2MBd rate, because it is out of spec, and can be difficult to undo
 	{
 		write(DYN_ADDRESS_BAUDRATE, value);
 	}
@@ -51,16 +53,16 @@ void DynamixelDevice::communicationSpeed(uint32_t aSpeed)
 
 DynamixelStatus DynamixelDevice::init()
 {
-	//mStatusReturnLevel=0;
-	DynamixelStatus status=ping();
-	if(status!=DYN_STATUS_OK)
+	mStatusReturnLevel = 0;
+	DynamixelStatus status = ping();
+	if (status != DYN_STATUS_OK)
 	{
 		return status;
 	}
-	status=read(DYN_ADDRESS_SRL, mStatusReturnLevel);
-	if(status&DYN_STATUS_TIMEOUT)
+	status = read(DYN_ADDRESS_SRL, mStatusReturnLevel);
+	if (status & DYN_STATUS_TIMEOUT)
 	{
-		mStatusReturnLevel=0;
+		mStatusReturnLevel = 0;
 	}
 	return DYN_STATUS_OK;
 }
@@ -79,7 +81,7 @@ void DynamixelMotor::wheelMode()
 
 void DynamixelMotor::jointMode(uint16_t aCWLimit, uint16_t aCCWLimit)
 {
-	uint32_t data= (aCWLimit | (uint32_t(aCCWLimit)<<16));
+	uint32_t data = (aCWLimit | (uint32_t(aCCWLimit) << 16));
 	write(DYN_ADDRESS_CW_LIMIT, data);
 }
 

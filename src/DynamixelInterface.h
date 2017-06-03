@@ -9,8 +9,6 @@
 
 #include "Dynamixel.h"
 
-#define COM_TIMEOUT 2 // unit: ms [WARNING: standard timeout is 50]
-
 /**
  * \class  DynamixelInterface
  * \brief Represent a dynamixel bus
@@ -24,15 +22,16 @@ public:
 	* \param[in] aDirectionPin : direction pin, use NO_DIR_PORT if you do not one (default)
 	* \param[in] aTranferOwnership : if true, the stream will be deleted in the destructor
 	*/
-	DynamixelInterface(HardwareSerial &aStream, uint8_t aDirectionPin = NO_DIR_PORT, bool aTranferOwnership = false);
+	DynamixelInterface(HardwareSerial &aStream, uint8_t aDirectionPin = NO_DIR_PORT);
 
 	/**
 	* \brief Start interface
 	* \param[in] aBaud : Baudrate
+	* \param[in] timeout : the underlying Stream will have its timeout set to this value
 	*
 	* Start the interface with desired baudrate, call once before using the interface
 	*/
-	void begin(unsigned long aBaud);
+	void begin(unsigned long aBaud, unsigned long timeout = 50);
 
 	/**
 	* \brief Send a packet on bus
@@ -59,24 +58,24 @@ public:
 	
 	//sizeof(T) must be lower than DYN_INTERNAL_BUFFER_SIZE, and in any case lower than 256
 	template<class T>
-	inline DynamixelStatus read(uint8_t aID, uint8_t aAddress, T& aData, uint8_t aStatusReturnLevel=2);
+	inline DynamixelStatus read(uint8_t aID, uint8_t aAddress, T& aData, uint8_t aStatusReturnLevel = 2);
 	template<class T>
-	inline DynamixelStatus write(uint8_t aID, uint8_t aAddress, const T& aData, uint8_t aStatusReturnLevel=2);
+	inline DynamixelStatus write(uint8_t aID, uint8_t aAddress, const T& aData, uint8_t aStatusReturnLevel = 2);
 	template<class T>
-	inline DynamixelStatus regWrite(uint8_t aID, uint8_t aAddress, const T& aData, uint8_t aStatusReturnLevel=2);
+	inline DynamixelStatus regWrite(uint8_t aID, uint8_t aAddress, const T& aData, uint8_t aStatusReturnLevel = 2);
 	
-	DynamixelStatus read(uint8_t aID, uint8_t aAddress, uint8_t aSize, uint8_t *aPtr, uint8_t aStatusReturnLevel=2);
-	DynamixelStatus write(uint8_t aID, uint8_t aAddress, uint8_t aSize, const uint8_t *aPtr, uint8_t aStatusReturnLevel=2);
-	DynamixelStatus regWrite(uint8_t aID, uint8_t aAddress, uint8_t aSize, const uint8_t *aPtr, uint8_t aStatusReturnLevel=2);
-	DynamixelStatus syncWrite(uint8_t nID, const uint8_t *aID, uint8_t aAddress, uint8_t aSize, const uint8_t *aPtr, uint8_t aStatusReturnLevel=2);
+	DynamixelStatus read(uint8_t aID, uint8_t aAddress, uint8_t aSize, uint8_t *aPtr, uint8_t aStatusReturnLevel = 2);
+	DynamixelStatus write(uint8_t aID, uint8_t aAddress, uint8_t aSize, const uint8_t *aPtr, uint8_t aStatusReturnLevel = 2);
+	DynamixelStatus regWrite(uint8_t aID, uint8_t aAddress, uint8_t aSize, const uint8_t *aPtr, uint8_t aStatusReturnLevel = 2);
+	DynamixelStatus syncWrite(uint8_t nID, const uint8_t *aID, uint8_t aAddress, uint8_t aSize, const uint8_t *aPtr, uint8_t aStatusReturnLevel = 2);
 	
 	DynamixelStatus ping(uint8_t aID);
-	DynamixelStatus action(uint8_t aID=BROADCAST_ID, uint8_t aStatusReturnLevel=2);
+	DynamixelStatus action(uint8_t aID=BROADCAST_ID, uint8_t aStatusReturnLevel = 2);
 	DynamixelStatus reset(uint8_t aID, uint8_t aStatusReturnLevel=2);
 	
 private:
 
-	/** \brief Switch stream to read (receive)) mode */
+	/** \brief Switch stream to read (receive) mode */
 	void readMode();
 
 	/** \brief Switch stream to write (send) mode */
@@ -89,7 +88,6 @@ private:
 	static const uint8_t NO_DIR_PORT = 255;
 	HardwareSerial &mStream;
 	const uint8_t mDirectionPin;
-	bool mStreamOwner;
 };
 
 
