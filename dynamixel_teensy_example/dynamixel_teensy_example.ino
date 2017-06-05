@@ -9,7 +9,8 @@ void setup()
 
 void loop()
 {
-	DynamixelInterface dInterface(Serial1, 50);	// Stream , timeout
+	DynamixelInterface dInterface(Serial1);	// Stream
+	dInterface.begin(9600, 50); // baudrate, timeout
 	DynamixelMotor motor(dInterface, 0);	// Interface , ID
 
 	motor.init(); // This will get the returnStatusLevel of the servo
