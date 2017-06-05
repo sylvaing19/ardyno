@@ -14,42 +14,46 @@ DynamixelInterface::DynamixelInterface(HardwareSerial &aStream, uint8_t aDirecti
 void DynamixelInterface::begin(unsigned long aBaud, unsigned long timeout)
 {
 	mStream.begin(aBaud);
+	
+	if (mDirectionPin == NO_DIR_PORT)
+	{
 #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__) // Teensy 3.0 3.1 3.2 3.5 3.6
-	if (&mStream == &Serial1)
-	{
-		UART0_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
-		CORE_PIN1_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
-	}
-	else if (&mStream == &Serial2)
-	{
-		UART1_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
-		CORE_PIN10_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
-	}
-	else if (&mStream == &Serial3)
-	{
-		UART2_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
-		CORE_PIN8_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
-	}
+		if (&mStream == &Serial1)
+		{
+			UART0_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
+			CORE_PIN1_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
+		}
+		else if (&mStream == &Serial2)
+		{
+			UART1_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
+			CORE_PIN10_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
+		}
+		else if (&mStream == &Serial3)
+		{
+			UART2_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
+			CORE_PIN8_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
+		}
 #if defined(__MK64FX512__) || defined(__MK66FX1M0__) // Teensy 3.5 or 3.6
-	else if (&mStream == &Serial4)
-	{
-		UART3_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
-		CORE_PIN32_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
-	}
-	else if (&mStream == &Serial5)
-	{
-		UART4_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
-		CORE_PIN33_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
-	}
-	else if (&mStream == &Serial6)
-	{
-		UART5_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
-		CORE_PIN48_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
-	}
+		else if (&mStream == &Serial4)
+		{
+			UART3_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
+			CORE_PIN32_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
+		}
+		else if (&mStream == &Serial5)
+		{
+			UART4_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
+			CORE_PIN33_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
+		}
+		else if (&mStream == &Serial6)
+		{
+			UART5_C1 |= UART_C1_LOOPS | UART_C1_RSRC; // Connect internally RX and TX for half duplex
+			CORE_PIN48_CONFIG |= PORT_PCR_PE | PORT_PCR_PS; // pullup on output pin
+		}
 #endif
 #else
 #error Dynamixel lib : unsupported hardware
 #endif
+	}
 	mStream.setTimeout(timeout); //warning : response delay seems much higher than expected for some operation (eg writing eeprom)
 	readMode();
 }
