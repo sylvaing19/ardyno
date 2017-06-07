@@ -93,6 +93,9 @@ public:
 	DynamixelStatus torqueLimit(uint16_t aTorque);
 	DynamixelStatus goalPosition(uint16_t aPosition);
 	DynamixelStatus goalPositionDegree(uint16_t posDeg);
+	void recoverTorque();
+
+	DynamixelStatus resetSecuritySettings();
 
 	void setId(uint8_t newId);
 	

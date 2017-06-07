@@ -53,16 +53,22 @@ void DynamixelDevice::communicationSpeed(uint32_t aSpeed)
 
 DynamixelStatus DynamixelDevice::init()
 {
-	mStatusReturnLevel = 0;
+	mStatusReturnLevel = 1;
 	DynamixelStatus status = ping();
 	if (status != DYN_STATUS_OK)
 	{
+		mStatusReturnLevel = 0;
 		return status;
 	}
 	status = read(DYN_ADDRESS_SRL, mStatusReturnLevel);
-	if (status & DYN_STATUS_TIMEOUT)
+	if (status & (DYN_STATUS_COM_ERROR | DYN_STATUS_TIMEOUT))
 	{
 		mStatusReturnLevel = 0;
+	}
+	else if (status != DYN_STATUS_OK)
+	{
+		mStatusReturnLevel = 0;
+		return status;
 	}
 	return DYN_STATUS_OK;
 }
@@ -116,6 +122,41 @@ DynamixelStatus DynamixelMotor::goalPositionDegree(uint16_t posDeg)
 	return goalPosition(posDeg * 3.41);
 }
 
+void DynamixelMotor::recoverTorque()
+{
+	uint16_t currentPosition = -1;
+	if (!(read(DYN_ADDRESS_CURRENT_POSITION, currentPosition) & DYN_STATUS_COM_ERROR))
+	{
+		if (currentPosition != (uint16_t)-1)
+		{
+			write(DYN_ADDRESS_GOAL_POSITION, currentPosition);
+		}
+	}
+
+	uint16_t torque = 0x3FF;
+	if (read(DYN_ADDRESS_MAX_TORQUE, torque) & DYN_STATUS_COM_ERROR)
+	{
+		write(DYN_ADDRESS_TORQUE_LIMIT, 0x3FF);
+	}
+	else
+	{
+		write(DYN_ADDRESS_TORQUE_LIMIT, torque);
+	}
+	enableTorque();
+}
+
+DynamixelStatus DynamixelMotor::resetSecuritySettings()
+{
+	DynamixelStatus status = 0;
+	status |= write(DYN_ADDRESS_TEMP_LIMIT, (uint8_t)85);
+	status |= write(DYN_ADDRESS_LOW_VOLTAGE_LIMIT, (uint8_t)60);
+	status |= write(DYN_ADDRESS_HIGH_VOLTAGE_LIMIT, (uint8_t)140);
+	status |= write(DYN_ADDRESS_MAX_TORQUE, (uint16_t)0x3FF);
+	status |= write(DYN_ADDRESS_ALARM_LED, (uint8_t)36);
+	status |= write(DYN_ADDRESS_ALARM_SHUTDOWN, (uint8_t)36);
+	return status;
+}
+
 void DynamixelMotor::setId(uint8_t newId)
 {
 	write(DYN_ADDRESS_ID, newId);
@@ -130,13 +171,13 @@ void DynamixelMotor::led(uint8_t aState)
 uint16_t DynamixelMotor::currentPosition()
 {
 	uint16_t currentPosition;
-	if (read(DYN_ADDRESS_CURRENT_POSITION, currentPosition) == 0)
+	if (read(DYN_ADDRESS_CURRENT_POSITION, currentPosition) & DYN_STATUS_COM_ERROR)
 	{
-		return currentPosition;
+		return UINT16_MAX;
 	}
 	else
 	{
-		return UINT16_MAX;
+		return currentPosition;
 	}
 }
 
