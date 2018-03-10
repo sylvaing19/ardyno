@@ -168,21 +168,16 @@ void DynamixelMotor::led(uint8_t aState)
 	write(DYN_ADDRESS_LED, aState);
 }
 
-uint16_t DynamixelMotor::currentPosition()
+DynamixelStatus DynamixelMotor::currentPosition(uint16_t &aPosition)
 {
-	uint16_t currentPosition;
-	if (read(DYN_ADDRESS_CURRENT_POSITION, currentPosition) & DYN_STATUS_COM_ERROR)
-	{
-		return UINT16_MAX;
-	}
-	else
-	{
-		return currentPosition;
-	}
+    aPosition = UINT16_MAX;
+    return read(DYN_ADDRESS_CURRENT_POSITION, aPosition);
 }
 
-uint16_t DynamixelMotor::currentPositionDegree()
+DynamixelStatus DynamixelMotor::currentPositionDegree(uint16_t &aPosition)
 {
-	return (uint16_t)((float)currentPosition() / 3.41);
+    DynamixelStatus status = currentPosition(aPosition);
+    aPosition = (uint16_t)((float)aPosition / 3.41);
+	return status;
 }
 

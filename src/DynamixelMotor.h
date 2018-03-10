@@ -101,8 +101,8 @@ public:
 	
 	void led(uint8_t aState);
 
-	uint16_t currentPosition();
-	uint16_t currentPositionDegree();
+	DynamixelStatus currentPosition(uint16_t &aPosition);
+    DynamixelStatus currentPositionDegree(uint16_t &aPosition);
 };
 
 #endif
