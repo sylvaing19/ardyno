@@ -1,7 +1,7 @@
 #include "DynamixelMotor.h"
 
 DynamixelDevice::DynamixelDevice(DynamixelInterface &aInterface, DynamixelID aID):
-	mInterface(aInterface), mID(aID), mStatusReturnLevel(255)
+	mInterface(aInterface), mStatusReturnLevel(255), mID(aID)
 {
 	mStatus = DYN_STATUS_OK;
 	if (mID == BROADCAST_ID)
