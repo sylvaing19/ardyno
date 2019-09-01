@@ -4,7 +4,7 @@
 
 void setup()
 {
-	Serial.println("Mon chibre est tentaculaire");
+	Serial.println("Dynamixel Teensy example - begin");
 }
 
 void loop()
